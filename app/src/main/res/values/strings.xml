@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Authentication</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="failure_message">Wrong username or password!</string>
+    <string name="missing_field_message">All fields are required.</string>
+    <string name="success_message">Logged in successfully!</string>
+</resources>
