@@ -5,6 +5,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -147,6 +150,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scheduleNotification(String message) {
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.notification_image);
+
+        Intent intent = new Intent(this, workActiviy.class);
+        Intent intent1 = new Intent(this, LazyDay.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent2 = PendingIntent.getActivity(this, NOTIFICATION_ID, intent1, PendingIntent.FLAG_ONE_SHOT);
+
+        NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_notifications, "", pendingIntent).build();
+        NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_notifications, "", pendingIntent2).build();
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notifications)
+                .setContentText("Get to work")
+                .setNumber(++bigNumber)
+                .setContentTitle("Lets rule the world")
+                .setStyle(new NotificationCompat.BigPictureStyle().setSummaryText(message))
+                .addAction(action)
+                .addAction(action2)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(NOTIFICATION_ID, notification);
 
     }
 }
