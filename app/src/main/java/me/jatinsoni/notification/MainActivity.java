@@ -22,16 +22,13 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    // set up the credentials constants
+    // set up the credentials and notification constants
     private static final String USERNAME = "edureka";
     private static final String PASSWORD = "edureka123";
     private static final String CHANNEL_ID = "personal_notifications";
     private static final int NOTIFICATION_ID = 1;
     private static int numMessages;
     private static int bigNumber;
-
-    private PendingIntent pendingIntent;
-    private PowerManager.WakeLock wakeLock;
 
     // widget members
     EditText username, password;
@@ -71,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
                     feedbackMessage.setText(getResources().getString(R.string.missing_field_message));
                     feedbackMessage.setTextColor(getResources().getColor(R.color.colorWarning));
                     feedbackMessage.setVisibility(View.VISIBLE);
-                    displaySimpleNotification("All fields are required");
+
+                    // shoot typical notification on empty fields
+                    displaySimpleNotification(getResources().getString(R.string.missing_field_message));
 
                 }
                 // if both fields has value than move on
@@ -89,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
                         // set button state to disabled
                         loginButton.setEnabled(false);
 
+                        // shoot big style notification with home and profile actions
+                        scheduleNotification(getResources().getString(R.string.success_message));
+
                     }
                     // display message if wrong credentials
                     else {
@@ -104,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
                         username.setText("");
                         password.setText("");
 
+                        // shoot typical notification on wrong credentials
+                        displaySimpleNotification(getResources().getString(R.string.failure_message));
+
                     }
 
                 }
@@ -113,14 +118,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Shoot notification with required message
+     *
+     * @param text {string} - notification text
+     * @return void
+     */
     private void displaySimpleNotification(String text) {
 
+        //create notification channel
         createNotificationChannel();
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
 
         mBuilder.setSmallIcon(R.drawable.ic_notifications);
-        mBuilder.setContentTitle("Authentication");
+        mBuilder.setContentTitle(getResources().getString(R.string.authentication));
         mBuilder.setContentText(text);
         mBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
         mBuilder.setNumber(++numMessages);
@@ -131,6 +143,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Create notification channel for the app
+     *
+     * @return void
+     */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Personal Notifications";
@@ -149,25 +166,35 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Create scheduled notification. This is the big type
+     * notification display with the bitmap (picture) and
+     * having multiple actions
+     *
+     * @param message {string} - notification message
+     */
     private void scheduleNotification(String message) {
+
+        // create notification channel
+        createNotificationChannel();
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.notification_image);
 
-        Intent intent = new Intent(this, workActiviy.class);
-        Intent intent1 = new Intent(this, LazyDay.class);
+        Intent intent = new Intent(this, Home.class);
+        Intent intent1 = new Intent(this, Profile.class);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_ONE_SHOT);
         PendingIntent pendingIntent2 = PendingIntent.getActivity(this, NOTIFICATION_ID, intent1, PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_notifications, "", pendingIntent).build();
-        NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_notifications, "", pendingIntent2).build();
+        NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_home, "Home", pendingIntent).build();
+        NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_profile, "Profile", pendingIntent2).build();
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications)
-                .setContentText("Get to work")
+                .setContentText(getResources().getString(R.string.success_message))
                 .setNumber(++bigNumber)
-                .setContentTitle("Lets rule the world")
-                .setStyle(new NotificationCompat.BigPictureStyle().setSummaryText(message))
+                .setContentTitle(getResources().getString(R.string.authentication))
+                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).setSummaryText(message))
                 .addAction(action)
                 .addAction(action2)
                 .setDefaults(Notification.DEFAULT_ALL)
